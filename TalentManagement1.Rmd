@@ -1,0 +1,145 @@
+---
+title: "CaseStudy2"
+author: "William Hinton"
+date: "8/10/2019"
+output: 
+  html_document: 
+    keep_md: true
+---
+# Introduction 
+This R markdown document will be providing analysis of Talent Management. This process is to leverage our data analysis by creating a linear model and then use stepwise model to pick the idea model. After StepWise identifies some key attributes. We will drill down into Tableau to conduct a more meanful analysis. 
+
+##Libraries that are needed for this process.
+```{r ,INCLUDE=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(data.table)
+library(tidyverse)
+library(sqldf)
+library(caTools)
+library(MASS)
+library(caret)
+library(leaps)
+library(QuantPsyc)
+library(GGally)
+```
+## House cleaning activites Read file
+ Read in dataset cleanup dataset, identifies is.na and any columns we do not want to use.
+```{r echo=TRUE}
+a <-read.csv("C:/SMU_MasterProgram/SummerMay052019/DS_6306_DataScience_402/CaseStudy2/CaseStudy2_2_2/TalentManagement.csv", sep =",", header = TRUE)
+#a1_education <- data.frame(sqldf("SELECT COUNT(*), education FROM a GROUP BY education"))  # count of education by state
+
+
+setnames(a, old=c("ï..Age"), new=c("Age"))
+attrJobs <- a
+str(a)
+#set yes/no to 0,1
+attrJobs$Adj[attrJobs$Attrition=="Yes"]<-1  
+
+attrJobs$Adj[attrJobs$Attrition=="No"]<-0
+
+
+# 1. Model1 A - All variables
+model <- lm(attrJobs$Adj ~ OverTime + 
+              MaritalStatus + 
+              JobRole + 
+              Gender + 
+              EducationField +
+              Department + 
+              BusinessTravel + 
+              YearsWithCurrManager +
+              YearsSinceLastPromotion +
+              YearsInCurrentRole + 
+              YearsAtCompany + 
+              WorkLifeBalance + 
+              TrainingTimesLastYear +
+              TotalWorkingYears + 
+              StockOptionLevel + 
+              RelationshipSatisfaction + 
+              PerformanceRating +
+              PercentSalaryHike + 
+              NumCompaniesWorked + 
+              MonthlyRate + 
+              MonthlyIncome + 
+              JobSatisfaction +
+              JobLevel + 
+              JobInvolvement + 
+              HourlyRate + 
+              EnvironmentSatisfaction + 
+              Education + 
+              DistanceFromHome +
+              DailyRate +
+              Age
+            , data = attrJobs)
+summary(model)
+
+# 2. Model1 A - All significant variables
+model1A <- lm(attrJobs$Adj ~ OverTime + 
+              MaritalStatus + 
+              JobRole + 
+              Gender + 
+              BusinessTravel + 
+              YearsSinceLastPromotion +
+              YearsInCurrentRole + 
+              YearsAtCompany +               
+              WorkLifeBalance + 
+              TrainingTimesLastYear +
+              RelationshipSatisfaction +               
+              NumCompaniesWorked +               
+              JobSatisfaction +              
+              JobInvolvement + 
+              JobSatisfaction +
+              JobInvolvement +               
+              DistanceFromHome +              
+              Age
+            , data = attrJobs)
+summary(model1A)
+
+#full fit
+full_fit<- lm(attrJobs$Adj ~ OverTime + 
+              MaritalStatus + 
+              JobRole + 
+              Gender + 
+              EducationField +
+              Department + 
+              BusinessTravel + 
+              YearsWithCurrManager +
+              YearsSinceLastPromotion +
+              YearsInCurrentRole + 
+              YearsAtCompany + 
+              WorkLifeBalance + 
+              TrainingTimesLastYear +
+              TotalWorkingYears + 
+              StockOptionLevel + 
+              RelationshipSatisfaction + 
+              PerformanceRating +
+              PercentSalaryHike + 
+              NumCompaniesWorked + 
+              MonthlyRate + 
+              MonthlyIncome + 
+              JobSatisfaction +
+              JobLevel + 
+              JobInvolvement + 
+              HourlyRate + 
+              EnvironmentSatisfaction + 
+              Education + 
+              DistanceFromHome +
+              DailyRate +
+              Age 
+           , data = attrJobs )
+
+step(full_fit, direction="both")
+
+stepw <- lm(formula = attrJobs$Adj ~ OverTime + MaritalStatus + JobRole + 
+    Gender + EducationField + BusinessTravel + YearsWithCurrManager + 
+    YearsSinceLastPromotion + YearsInCurrentRole + YearsAtCompany + 
+    WorkLifeBalance + TrainingTimesLastYear + TotalWorkingYears + 
+    RelationshipSatisfaction + NumCompaniesWorked + JobSatisfaction + 
+    JobInvolvement + EnvironmentSatisfaction + DistanceFromHome + 
+    Age, data = attrJobs)
+
+summary(stepw)
+
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
