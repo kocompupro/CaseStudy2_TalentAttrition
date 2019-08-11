@@ -1,6 +1,6 @@
 ---
 title: "CaseStudy2"
-author: "William Hinton"
+author: "William Hinton & Jayson Barker"
 date: "8/10/2019"
 output: 
   html_document: 
